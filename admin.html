@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -7,94 +7,70 @@
     <style>
         :root { --bg: #0f0f0f; --card: #1a1a1a; --accent: #007bff; --text: #e0e0e0; }
         body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        
-        /* ВХОД */
-        .login-box { background: var(--card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.7); text-align: center; width: 85%; max-width: 350px; }
+        .login-box { background: var(--card); padding: 30px; border-radius: 20px; text-align: center; width: 85%; max-width: 350px; border: 1px solid #333; }
         input, textarea, select { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 10px; border: 1px solid #333; background: #111; color: white; box-sizing: border-box; font-size: 16px; }
-        .btn-main { width: 100%; padding: 15px; background: var(--accent); border: none; color: white; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.2s; }
-        .btn-main:active { transform: scale(0.98); }
-        
-        /* АДМИНКА */
-        #admin-content { display: none; width: 100%; max-width: 600px; padding: 15px; box-sizing: border-box; }
+        .btn-main { width: 100%; padding: 15px; background: var(--accent); border: none; color: white; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        #admin-content { display: none; width: 100%; max-width: 500px; padding: 15px; box-sizing: border-box; }
         .card { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #333; }
-        
-        /* ТАБЫ */
         .nav-tabs { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; }
-        .tab { flex: 1; text-align: center; padding: 12px; background: #252525; border-radius: 10px; cursor: pointer; font-size: 13px; white-space: nowrap; }
+        .tab { flex: 1; text-align: center; padding: 10px; background: #252525; border-radius: 8px; cursor: pointer; font-size: 13px; white-space: nowrap; }
         .tab.active { background: var(--accent); font-weight: bold; }
-        
-        .product-item { background: #111; padding: 10px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--accent); font-size: 14px; display: flex; justify-content: space-between; }
+        .product-item { background: #111; padding: 10px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--accent); display: flex; justify-content: space-between; }
         .hidden { display: none; }
-        h1 { font-size: 22px; margin-bottom: 20px; text-align: center; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 
     <div id="login-screen" class="login-box">
-        <h2 style="color:var(--accent); letter-spacing:3px;">ELECTRUM</h2>
+        <h2 style="color:var(--accent);">ELECTRUM</h2>
         <input type="text" id="user-input" placeholder="Логин">
         <input type="password" id="pass-input" placeholder="Пароль">
         <button class="btn-main" onclick="login()">ВОЙТИ</button>
-        <p id="err" style="color: #ff4d4d; display: none; margin-top: 15px;">Неверные данные</p>
+        <p id="err" style="color: #ff4d4d; display: none; margin-top:10px;">Ошибка входа</p>
     </div>
 
     <div id="admin-content">
-        <h1>💎 ЦЕНТР УПРАВЛЕНИЯ</h1>
-
+        <h2 style="text-align:center;">💎 ELECTRUM PANEL</h2>
         <div class="nav-tabs">
-            <div class="tab active" onclick="showTab('sections', this)">📦 Разделы</div>
-            <div class="tab" onclick="showTab('items', this)">💰 Склад</div>
+            <div class="tab active" onclick="showTab('sections', this)">📦 База</div>
+            <div class="tab" onclick="showTab('items', this)">💰 Товар</div>
             <div class="tab" onclick="showTab('view', this)">👁 Обзор</div>
             <div class="tab" style="background:#e67e22;" onclick="showTab('broadcast', this)">📢 Рассылка</div>
         </div>
 
         <div id="sections-part" class="card">
-            <h3>Создать категорию</h3>
-            <input type="text" id="new-cat" placeholder="Например: VIP Аккаунты">
-            <button class="btn-main" onclick="addCategory()">+ Добавить раздел</button>
+            <input type="text" id="new-cat" placeholder="Название категории">
+            <button class="btn-main" onclick="addCategory()">+ СОЗДАТЬ РАЗДЕЛ</button>
         </div>
 
         <div id="items-part" class="card hidden">
-            <h3>Добавить товар</h3>
             <select id="p-cat"></select>
-            <input type="text" id="p-name" placeholder="Название товара">
-            <input type="number" id="p-price" placeholder="Цена (RUB)">
-            <input type="text" id="p-img" placeholder="Ссылка на фото (необязательно)">
-            <textarea id="p-desc" rows="3" placeholder="Описание товара..."></textarea>
-            <button class="btn-main" onclick="addProduct()">🚀 Выставить на продажу</button>
+            <input type="text" id="p-name" placeholder="Название">
+            <input type="number" id="p-price" placeholder="Цена">
+            <textarea id="p-desc" placeholder="Описание"></textarea>
+            <button class="btn-main" onclick="addProduct()">🚀 ВЫСТАВИТЬ</button>
         </div>
 
-        <div id="view-part" class="card hidden">
-            <h3>Текущие товары:</h3>
-            <div id="product-list">Загрузка...</div>
-        </div>
+        <div id="view-part" class="card hidden"><div id="product-list"></div></div>
 
         <div id="broadcast-part" class="card hidden">
-            <h3 style="color:#e67e22;">Массовая рассылка</h3>
-            <p style="font-size:12px; color:#aaa;">Сообщение уйдет всем, кто нажимал /start</p>
-            <textarea id="bc-text" rows="5" placeholder="Текст рассылки..."></textarea>
-            <button class="btn-main" style="background:#e67e22;" onclick="sendBroadcast()">📨 ОТПРАВИТЬ ВСЕМ</button>
+            <textarea id="bc-text" rows="5" placeholder="Текст для всех клиентов..."></textarea>
+            <button class="btn-main" style="background:#e67e22;" onclick="sendBroadcast()">🚀 ОТПРАВИТЬ ВСЕМ</button>
         </div>
-
-        <div id="status" style="display:none; text-align:center; color:#2ecc71; margin-top:15px; font-weight:bold;">✅ ГОТОВО!</div>
-        <button onclick="location.reload()" style="width:100%; background:none; color:#555; border:none; margin-top:30px; padding:10px;">Выйти</button>
     </div>
 
     <script>
-        // ТВОИ ДАННЫЕ
         const AUTH = { u: "Admin2006", p: "S6gjska68H53H64471" };
         const GH = {
-            token: "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", // Твой токен
+            token: "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",
             repo: "gol131111-ctrl/electrum-",
             file: "db.json"
         };
 
         function login() {
-            if(document.getElementById('user-input').value === AUTH.u && 
-               document.getElementById('pass-input').value === AUTH.p) {
-                document.getElementById('login-screen').classList.add('hidden');
+            if(document.getElementById('user-input').value === AUTH.u && document.getElementById('pass-input').value === AUTH.p) {
+                document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('admin-content').style.display = 'block';
-                document.body.style.alignItems = 'flex-start';
                 loadData();
             } else { document.getElementById('err').style.display = 'block'; }
         }
@@ -112,66 +88,43 @@
                 const res = await fetch(`https://api.github.com/repos/${GH.repo}/contents/${GH.file}`);
                 const data = await res.json();
                 const content = JSON.parse(decodeURIComponent(escape(atob(data.content))));
-                
-                // Проверка структуры базы
-                if(!content.users) content.users = [];
-                if(!content.broadcast_msg) content.broadcast_msg = "";
-                
-                window.currentDB = content;
-                window.dbSha = data.sha;
-                
+                window.currentDB = content; window.dbSha = data.sha;
                 const sel = document.getElementById('p-cat');
-                sel.innerHTML = '';
-                content.categories.forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
-            } catch(e) { alert("Ошибка загрузки базы!"); }
-        }
-
-        function renderList() {
-            const list = document.getElementById('product-list');
-            list.innerHTML = '';
-            window.currentDB.products.forEach(p => {
-                list.innerHTML += `<div class="product-item"><span>${p.name}</span> <b>${p.price}₽</b></div>`;
-            });
+                if (sel) {
+                    sel.innerHTML = '';
+                    content.categories.forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
+                }
+            } catch(e) { alert("Ошибка связи с базой!"); }
         }
 
         async function saveData() {
-            const jsonStr = JSON.stringify(window.currentDB, null, 2);
-            const contentEncoded = btoa(unescape(encodeURIComponent(jsonStr)));
-            
+            const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(window.currentDB, null, 2))));
             await fetch(`https://api.github.com/repos/${GH.repo}/contents/${GH.file}`, {
                 method: 'PUT',
                 headers: { 'Authorization': `token ${GH.token}` },
-                body: JSON.stringify({ message: "Update via Admin", content: contentEncoded, sha: window.dbSha })
+                body: JSON.stringify({ message: "Update", content: contentEncoded, sha: window.dbSha })
             });
-            
-            document.getElementById('status').style.display = 'block';
-            setTimeout(() => location.reload(), 1500);
+            alert("✅ Сохранено!"); location.reload();
         }
 
         function addCategory() {
-            const val = document.getElementById('new-cat').value;
-            if(val) { window.currentDB.categories.push(val); saveData(); }
+            const v = document.getElementById('new-cat').value;
+            if(v) { window.currentDB.categories.push(v); saveData(); }
         }
 
         function addProduct() {
-            const p = {
-                id: Date.now(),
-                name: document.getElementById('p-name').value,
-                price: document.getElementById('p-price').value,
-                img: document.getElementById('p-img').value,
-                desc: document.getElementById('p-desc').value,
-                cat: document.getElementById('p-cat').value
-            };
+            const p = { id: Date.now(), name: document.getElementById('p-name').value, price: document.getElementById('p-price').value, desc: document.getElementById('p-desc').value, cat: document.getElementById('p-cat').value };
             window.currentDB.products.push(p); saveData();
         }
 
+        function renderList() {
+            const l = document.getElementById('product-list');
+            l.innerHTML = window.currentDB.products.map(p => `<div class="product-item"><span>${p.name}</span><b>${p.price}₽</b></div>`).join('');
+        }
+
         function sendBroadcast() {
-            const txt = document.getElementById('bc-text').value;
-            if(!txt) return alert("Введите текст!");
-            if(confirm("Отправить это сообщение всем пользователям?")) {
-                window.currentDB.broadcast_msg = txt; // Записываем сообщение в базу
-                saveData();
-            }
+            const t = document.getElementById('bc-text').value;
+            if(t) { window.currentDB.broadcast_msg = t; saveData(); }
         }
     </script>
 </body>
