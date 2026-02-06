@@ -3,231 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ELECTRUM | ULTIMATE OS</title>
+    <title>ELECTRUM — Панель управления</title>
     <style>
-        :root { --neon: #00d4ff; --bg: #050505; --card: #111113; --text: #ffffff; --danger: #ff4466; --success: #00ff88; }
-        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 100px; }
+        :root { --bg: #0f0f0f; --card: #1a1a1a; --accent: #007bff; --text: #e0e0e0; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         
-        .header { background: var(--card); padding: 20px; text-align: center; border-bottom: 2px solid var(--neon); position: sticky; top: 0; z-index: 1000; }
-        .header h1 { margin: 0; font-size: 20px; letter-spacing: 5px; color: var(--neon); text-shadow: 0 0 10px var(--neon); }
-        
-        .notify-badge { position: absolute; top: 10px; right: 20px; background: var(--danger); color: white; font-size: 10px; padding: 4px 8px; border-radius: 20px; display: none; animation: pulse 1s infinite; }
-        
-        .container { padding: 20px; max-width: 600px; margin: 0 auto; }
-        .section { display: none; animation: slideUp 0.4s ease; }
-        .section.active { display: block; }
-        
-        /* Stats Dashboard */
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
-        .stat-box { background: var(--card); padding: 20px; border-radius: 15px; border-left: 4px solid var(--neon); }
-        .stat-val { font-size: 24px; font-weight: bold; color: var(--neon); }
-        .stat-label { font-size: 10px; color: #666; text-transform: uppercase; }
+        /* Стили входа */
+        .login-box { background: var(--card); padding: 40px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.7); text-align: center; width: 320px; }
+        .login-box h2 { margin-bottom: 25px; letter-spacing: 2px; color: var(--accent); }
+        input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 10px; border: 1px solid #333; background: #111; color: white; box-sizing: border-box; }
+        .btn-main { width: 100%; padding: 15px; background: var(--accent); border: none; color: white; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-main:hover { background: #0056b3; transform: scale(1.02); }
 
-        /* Items List (Склад) */
-        .db-item { background: #1a1a1c; padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
-        .db-item-info { font-size: 14px; }
-        .btn-edit { background: var(--neon); color: black; padding: 5px 10px; border-radius: 5px; font-size: 11px; margin-right: 5px; cursor: pointer; border: none; font-weight: bold; }
-        .btn-del { background: var(--danger); color: white; padding: 5px 10px; border-radius: 5px; font-size: 11px; cursor: pointer; border: none; }
-
-        .card { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid #222; margin-bottom: 20px; }
-        h3 { margin: 0 0 15px 0; font-size: 12px; text-transform: uppercase; color: var(--neon); border-bottom: 1px solid #222; padding-bottom: 10px; }
+        /* Стили админки */
+        #admin-content { display: none; width: 95%; max-width: 900px; padding: 20px; }
+        .card { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #333; }
+        .status-ok { color: #2ecc71; font-weight: bold; margin-top: 10px; display: none; }
         
-        input, textarea, select { width: 100%; background: #000; border: 1px solid #333; color: white; padding: 12px; margin-bottom: 12px; border-radius: 10px; box-sizing: border-box; }
-        button { width: 100%; background: var(--neon); color: #000; border: none; padding: 16px; border-radius: 12px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
-
-        .nav { position: fixed; bottom: 0; width: 100%; background: rgba(17,17,19,0.98); display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #333; }
-        .nav-item { color: #555; font-size: 9px; font-weight: bold; text-transform: uppercase; cursor: pointer; text-align: center; }
-        .nav-item.active { color: var(--neon); }
-
-        .footer-gemini { text-align: center; font-size: 11px; color: #333; margin-top: 30px; }
-        
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab { padding: 10px 20px; background: #333; border-radius: 8px; cursor: pointer; }
+        .tab.active { background: var(--accent); }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <h1>ELECTRUM OS</h1>
-    <div id="new-order-alert" class="notify-badge">NEW ORDER</div>
-</div>
-
-<div class="container">
-    
-    <div id="dash" class="section active">
-        <div class="stat-grid">
-            <div class="stat-box"><div class="stat-label">Оборот</div><div class="stat-val" id="st-cash">0 ₽</div></div>
-            <div class="stat-box"><div class="stat-label">Заказы</div><div class="stat-val" id="st-orders">0</div></div>
-            <div class="stat-box"><div class="stat-label">Клиенты</div><div class="stat-val" id="st-users">0</div></div>
-            <div class="stat-box"><div class="stat-label">Товары</div><div class="stat-val" id="st-items">0</div></div>
-        </div>
-        <div class="card">
-            <h3>Активность системы</h3>
-            <p style="font-size: 12px; color: #888;">Все системы работают в штатном режиме. Бот онлайн.</p>
-        </div>
+    <div id="login-screen" class="login-box">
+        <h2>ELECTRUM</h2>
+        <input type="text" id="user-input" placeholder="Логин">
+        <input type="password" id="pass-input" placeholder="Пароль">
+        <button class="btn-main" onclick="login()">ВОЙТИ В СИСТЕМУ</button>
+        <p id="err" style="color: #ff4d4d; display: none; margin-top: 15px;">Ошибка доступа</p>
     </div>
 
-    <div id="store" class="section">
-        <div class="card">
-            <h3>Добавить товар / Раздел</h3>
-            <button onclick="switchTab('add-form', this)" style="margin-bottom:10px;">+ Создать новое</button>
-            <div id="inventory-list">
-                </div>
+    <div id="admin-content">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>🛠 Управление складом</h1>
+            <button onclick="location.reload()" style="background:none; border:1px solid #444; color:#888; cursor:pointer; border-radius:5px;">Выйти</button>
         </div>
+
+        <div class="nav-tabs">
+            <div class="tab active" onclick="showTab('sections')">📦 Разделы</div>
+            <div class="tab" onclick="showTab('items')">💰 Склад</div>
+        </div>
+
+        <div id="sections-part" class="card">
+            <h3>Добавить категорию</h3>
+            <input type="text" id="new-cat" placeholder="Название (например: VIP)">
+            <button class="btn-main" onclick="addCategory()">+ Добавить раздел</button>
+        </div>
+
+        <div id="items-part" class="card hidden">
+            <h3>Новый товар</h3>
+            <input type="text" id="p-name" placeholder="Название товара">
+            <input type="number" id="p-price" placeholder="Цена (руб)">
+            <input type="text" id="p-img" placeholder="Ссылка на фото (URL)">
+            <textarea id="p-desc" style="width:100%; background:#111; color:white; border:1px solid #333; border-radius:10px; padding:10px; margin-bottom:15px;" placeholder="Описание"></textarea>
+            <select id="p-cat" style="width:100%; padding:12px; background:#111; color:white; border-radius:10px; margin-bottom:15px;"></select>
+            <button class="btn-main" onclick="addProduct()">📦 Выставить на склад</button>
+        </div>
+
+        <div id="status" class="status-ok text-center">✅ СИСТЕМА ОБНОВЛЕНА</div>
     </div>
 
-    <div id="add-form" class="section">
-        <div class="card">
-            <h3 id="form-title">Конструктор контента</h3>
-            <select id="p-cat"><option value="">Выбери каталог</option></select>
-            <input type="text" id="p-name" placeholder="Название">
-            <input type="number" id="p-price" placeholder="Цена">
-            <textarea id="p-desc" placeholder="Описание"></textarea>
-            <input type="text" id="p-img" placeholder="Ссылка на фото">
-            <button id="main-action-btn" onclick="saveData()">Сохранить в базу</button>
-            <button onclick="switchTab('store', this)" style="background:none; color:#666; margin-top:10px;">Отмена</button>
-        </div>
-    </div>
-
-    <div id="users" class="section">
-        <div class="card">
-            <h3>База клиентов</h3>
-            <div id="user-list" style="font-size: 13px;">Загрузка...</div>
-        </div>
-    </div>
-
-    <div id="broadcast" class="section">
-        <div class="card">
-            <h3>Рассылка</h3>
-            <textarea id="bc-text" rows="5" placeholder="Текст..."></textarea>
-            <input type="text" id="bc-img" placeholder="URL фото">
-            <input type="text" id="bc-btn" placeholder="Текст кнопки">
-            <input type="text" id="bc-url" placeholder="Ссылка кнопки">
-            <button onclick="broadcast()" style="background:var(--danger); color:white;">Запустить</button>
-        </div>
-    </div>
-
-    <div class="footer-gemini">Powered by Ge mini ❤️‍🔥</div>
-</div>
-
-<div class="nav">
-    <div class="nav-item active" onclick="switchTab('dash', this)">Главная</div>
-    <div class="nav-item" onclick="switchTab('store', this)">Склад</div>
-    <div class="nav-item" onclick="switchTab('users', this)">Клиенты</div>
-    <div class="nav-item" onclick="switchTab('broadcast', this)">Рассылка</div>
-</div>
-
-<script>
-    const GITHUB_TOKEN = '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';
-    const REPO = 'gol131111-ctrl/electrum-';
-    const FILE_PATH = 'db.json';
-    let currentDb = null;
-    let editId = null;
-
-    async function loadDb() {
-        const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`, {
-            headers: {'Authorization': `token ${GITHUB_TOKEN}`, 'Cache-Control': 'no-cache'}
-        });
-        const data = await res.json();
-        currentDb = JSON.parse(decodeURIComponent(escape(atob(data.content))));
-        renderDash();
-        renderStore();
-        renderUsers();
-        return data.sha;
-    }
-
-    function renderDash() {
-        document.getElementById('st-items').innerText = currentDb.products.length;
-        document.getElementById('st-users').innerText = currentDb.users ? currentDb.users.length : 0;
-        document.getElementById('st-orders').innerText = currentDb.orders.length;
-        let total = currentDb.orders.reduce((acc, o) => acc + Number(o.sum || 0), 0);
-        document.getElementById('st-cash').innerText = total + ' ₽';
-    }
-
-    function renderStore() {
-        const list = document.getElementById('inventory-list');
-        list.innerHTML = currentDb.products.map(p => `
-            <div class="db-item">
-                <div class="db-item-info"><b>${p.name}</b><br><small>${p.price} ₽ | ${p.cat}</small></div>
-                <div>
-                    <button class="btn-edit" onclick="editItem(${p.id})">РЕД</button>
-                    <button class="btn-del" onclick="deleteItem(${p.id})">УДАЛ</button>
-                </div>
-            </div>
-        `).join('');
-        
-        const sel = document.getElementById('p-cat');
-        sel.innerHTML = '<option value="">Выбери каталог</option>' + 
-                        currentDb.categories.map(c => `<option value="${c}">${c}</option>`).join('');
-    }
-
-    function renderUsers() {
-        const list = document.getElementById('user-list');
-        if(!currentDb.users || currentDb.users.length === 0) {
-            list.innerHTML = "Клиентов пока нет"; return;
-        }
-        list.innerHTML = currentDb.users.map(u => `• ${u.name} (ID: ${u.id})`).join('<br>');
-    }
-
-    function switchTab(id, el) {
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        if(el.classList) el.classList.add('active');
-    }
-
-    async function editItem(id) {
-        const p = currentDb.products.find(x => x.id === id);
-        editId = id;
-        document.getElementById('p-name').value = p.name;
-        document.getElementById('p-price').value = p.price;
-        document.getElementById('p-desc').value = p.desc;
-        document.getElementById('p-img').value = p.img;
-        document.getElementById('p-cat').value = p.cat;
-        document.getElementById('form-title').innerText = "Редактирование";
-        switchTab('add-form', {});
-    }
-
-    async function deleteItem(id) {
-        if(!confirm("Удалить товар?")) return;
-        currentDb.products = currentDb.products.filter(p => p.id !== id);
-        await sync();
-    }
-
-    async function saveData() {
-        const p = {
-            id: editId || Date.now(),
-            name: document.getElementById('p-name').value,
-            price: document.getElementById('p-price').value,
-            desc: document.getElementById('p-desc').value,
-            img: document.getElementById('p-img').value,
-            cat: document.getElementById('p-cat').value
+    <script>
+        const AUTH = { u: "Admin2006", p: "S6gjska68H53H64471" };
+        const GITHUB_CONFIG = {
+            token: "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",
+            repo: "gol131111-ctrl/electrum-",
+            file: "db.json"
         };
 
-        if(editId) {
-            const idx = currentDb.products.findIndex(x => x.id === editId);
-            currentDb.products[idx] = p;
-        } else {
-            currentDb.products.push(p);
+        function login() {
+            const u = document.getElementById('user-input').value;
+            const p = document.getElementById('pass-input').value;
+            if(u === AUTH.u && p === AUTH.p) {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('admin-content').style.display = 'block';
+                document.body.style.alignItems = 'flex-start';
+                loadData();
+            } else {
+                document.getElementById('err').style.display = 'block';
+            }
         }
-        await sync();
-        editId = null;
-        location.reload();
-    }
 
-    async function sync() {
-        const sha = await loadDb();
-        const content = btoa(unescape(encodeURIComponent(JSON.stringify(currentDb, null, 2))));
-        await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`, {
-            method: 'PUT',
-            headers: {'Authorization': `token ${GITHUB_TOKEN}`},
-            body: JSON.stringify({ message: "Admin Sync", content: content, sha: sha })
-        });
-        alert("Синхронизировано!");
-    }
+        function showTab(t) {
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+            if(t === 'sections') {
+                document.getElementById('sections-part').classList.remove('hidden');
+                document.getElementById('items-part').classList.add('hidden');
+            } else {
+                document.getElementById('sections-part').classList.add('hidden');
+                document.getElementById('items-part').classList.remove('hidden');
+            }
+        }
 
-    loadDb();
-    setInterval(loadDb, 30000); // Автопроверка базы каждые 30 сек
-</script>
+        async function loadData() {
+            const res = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.file}`);
+            const data = await res.json();
+            const db = JSON.parse(atob(data.content));
+            const select = document.getElementById('p-cat');
+            select.innerHTML = '';
+            db.categories.forEach(c => {
+                let opt = document.createElement('option');
+                opt.value = c; opt.innerText = c;
+                select.appendChild(opt);
+            });
+            window.currentDB = db;
+            window.dbSha = data.sha;
+        }
+
+        async function saveData() {
+            const content = btoa(unescape(encodeURIComponent(JSON.stringify(window.currentDB, null, 2))));
+            await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.file}`, {
+                method: 'PUT',
+                headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` },
+                body: JSON.stringify({ message: "Update DB", content: content, sha: window.dbSha })
+            });
+            document.getElementById('status').style.display = 'block';
+            setTimeout(() => location.reload(), 1500);
+        }
+
+        function addCategory() {
+            const name = document.getElementById('new-cat').value;
+            if(!name) return;
+            window.currentDB.categories.push(name);
+            saveData();
+        }
+
+        function addProduct() {
+            const p = {
+                id: Date.now(),
+                name: document.getElementById('p-name').value,
+                price: document.getElementById('p-price').value,
+                img: document.getElementById('p-img').value,
+                desc: document.getElementById('p-desc').value,
+                cat: document.getElementById('p-cat').value
+            };
+            window.currentDB.products.push(p);
+            saveData();
+        }
+    </script>
 </body>
 </html>
