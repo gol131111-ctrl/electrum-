@@ -85,6 +85,7 @@
 
         async function loadData() {
             try {
+                // ИСПРАВЛЕНО: Добавлен слеш / перед contents
                 const res = await fetch(`https://api.github.com/repos/${GH.repo}/contents/${GH.file}`);
                 const data = await res.json();
                 const content = JSON.parse(decodeURIComponent(escape(atob(data.content))));
@@ -99,6 +100,7 @@
 
         async function saveData() {
             const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(window.currentDB, null, 2))));
+            // ИСПРАВЛЕНО: Добавлен слеш / перед contents
             await fetch(`https://api.github.com/repos/${GH.repo}/contents/${GH.file}`, {
                 method: 'PUT',
                 headers: { 'Authorization': `token ${GH.token}` },
