@@ -1,5 +1,7 @@
 {
-  "categories": [],
+  "categories": ["VIP Аккаунты", "Тестовый раздел"],
   "products": [],
-  "broadcast_msg": ""
+  "users": [],
+  "broadcast_msg": "",
+  "last_update": 0
 }
