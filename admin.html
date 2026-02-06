@@ -2,134 +2,155 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ELECTRUM — Панель управления</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ELECTRUM ADMIN</title>
     <style>
         :root { --bg: #0f0f0f; --card: #1a1a1a; --accent: #007bff; --text: #e0e0e0; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         
-        /* Стили входа */
-        .login-box { background: var(--card); padding: 40px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.7); text-align: center; width: 320px; }
-        .login-box h2 { margin-bottom: 25px; letter-spacing: 2px; color: var(--accent); }
-        input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 10px; border: 1px solid #333; background: #111; color: white; box-sizing: border-box; }
-        .btn-main { width: 100%; padding: 15px; background: var(--accent); border: none; color: white; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-main:hover { background: #0056b3; transform: scale(1.02); }
-
-        /* Стили админки */
-        #admin-content { display: none; width: 95%; max-width: 900px; padding: 20px; }
-        .card { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #333; }
-        .status-ok { color: #2ecc71; font-weight: bold; margin-top: 10px; display: none; }
+        /* ВХОД */
+        .login-box { background: var(--card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.7); text-align: center; width: 85%; max-width: 350px; }
+        input, textarea, select { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 10px; border: 1px solid #333; background: #111; color: white; box-sizing: border-box; font-size: 16px; }
+        .btn-main { width: 100%; padding: 15px; background: var(--accent); border: none; color: white; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.2s; }
+        .btn-main:active { transform: scale(0.98); }
         
-        .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab { padding: 10px 20px; background: #333; border-radius: 8px; cursor: pointer; }
-        .tab.active { background: var(--accent); }
+        /* АДМИНКА */
+        #admin-content { display: none; width: 100%; max-width: 600px; padding: 15px; box-sizing: border-box; }
+        .card { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #333; }
+        
+        /* ТАБЫ */
+        .nav-tabs { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; }
+        .tab { flex: 1; text-align: center; padding: 12px; background: #252525; border-radius: 10px; cursor: pointer; font-size: 13px; white-space: nowrap; }
+        .tab.active { background: var(--accent); font-weight: bold; }
+        
+        .product-item { background: #111; padding: 10px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--accent); font-size: 14px; display: flex; justify-content: space-between; }
         .hidden { display: none; }
+        h1 { font-size: 22px; margin-bottom: 20px; text-align: center; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 
     <div id="login-screen" class="login-box">
-        <h2>ELECTRUM</h2>
+        <h2 style="color:var(--accent); letter-spacing:3px;">ELECTRUM</h2>
         <input type="text" id="user-input" placeholder="Логин">
         <input type="password" id="pass-input" placeholder="Пароль">
-        <button class="btn-main" onclick="login()">ВОЙТИ В СИСТЕМУ</button>
-        <p id="err" style="color: #ff4d4d; display: none; margin-top: 15px;">Ошибка доступа</p>
+        <button class="btn-main" onclick="login()">ВОЙТИ</button>
+        <p id="err" style="color: #ff4d4d; display: none; margin-top: 15px;">Неверные данные</p>
     </div>
 
     <div id="admin-content">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h1>🛠 Управление складом</h1>
-            <button onclick="location.reload()" style="background:none; border:1px solid #444; color:#888; cursor:pointer; border-radius:5px;">Выйти</button>
-        </div>
+        <h1>💎 ЦЕНТР УПРАВЛЕНИЯ</h1>
 
         <div class="nav-tabs">
-            <div class="tab active" onclick="showTab('sections')">📦 Разделы</div>
-            <div class="tab" onclick="showTab('items')">💰 Склад</div>
+            <div class="tab active" onclick="showTab('sections', this)">📦 Разделы</div>
+            <div class="tab" onclick="showTab('items', this)">💰 Склад</div>
+            <div class="tab" onclick="showTab('view', this)">👁 Обзор</div>
+            <div class="tab" style="background:#e67e22;" onclick="showTab('broadcast', this)">📢 Рассылка</div>
         </div>
 
         <div id="sections-part" class="card">
-            <h3>Добавить категорию</h3>
-            <input type="text" id="new-cat" placeholder="Название (например: VIP)">
+            <h3>Создать категорию</h3>
+            <input type="text" id="new-cat" placeholder="Например: VIP Аккаунты">
             <button class="btn-main" onclick="addCategory()">+ Добавить раздел</button>
         </div>
 
         <div id="items-part" class="card hidden">
-            <h3>Новый товар</h3>
+            <h3>Добавить товар</h3>
+            <select id="p-cat"></select>
             <input type="text" id="p-name" placeholder="Название товара">
-            <input type="number" id="p-price" placeholder="Цена (руб)">
-            <input type="text" id="p-img" placeholder="Ссылка на фото (URL)">
-            <textarea id="p-desc" style="width:100%; background:#111; color:white; border:1px solid #333; border-radius:10px; padding:10px; margin-bottom:15px;" placeholder="Описание"></textarea>
-            <select id="p-cat" style="width:100%; padding:12px; background:#111; color:white; border-radius:10px; margin-bottom:15px;"></select>
-            <button class="btn-main" onclick="addProduct()">📦 Выставить на склад</button>
+            <input type="number" id="p-price" placeholder="Цена (RUB)">
+            <input type="text" id="p-img" placeholder="Ссылка на фото (необязательно)">
+            <textarea id="p-desc" rows="3" placeholder="Описание товара..."></textarea>
+            <button class="btn-main" onclick="addProduct()">🚀 Выставить на продажу</button>
         </div>
 
-        <div id="status" class="status-ok text-center">✅ СИСТЕМА ОБНОВЛЕНА</div>
+        <div id="view-part" class="card hidden">
+            <h3>Текущие товары:</h3>
+            <div id="product-list">Загрузка...</div>
+        </div>
+
+        <div id="broadcast-part" class="card hidden">
+            <h3 style="color:#e67e22;">Массовая рассылка</h3>
+            <p style="font-size:12px; color:#aaa;">Сообщение уйдет всем, кто нажимал /start</p>
+            <textarea id="bc-text" rows="5" placeholder="Текст рассылки..."></textarea>
+            <button class="btn-main" style="background:#e67e22;" onclick="sendBroadcast()">📨 ОТПРАВИТЬ ВСЕМ</button>
+        </div>
+
+        <div id="status" style="display:none; text-align:center; color:#2ecc71; margin-top:15px; font-weight:bold;">✅ ГОТОВО!</div>
+        <button onclick="location.reload()" style="width:100%; background:none; color:#555; border:none; margin-top:30px; padding:10px;">Выйти</button>
     </div>
 
     <script>
+        // ТВОИ ДАННЫЕ
         const AUTH = { u: "Admin2006", p: "S6gjska68H53H64471" };
-        const GITHUB_CONFIG = {
-            token: "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",
+        const GH = {
+            token: "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", // Твой токен
             repo: "gol131111-ctrl/electrum-",
             file: "db.json"
         };
 
         function login() {
-            const u = document.getElementById('user-input').value;
-            const p = document.getElementById('pass-input').value;
-            if(u === AUTH.u && p === AUTH.p) {
+            if(document.getElementById('user-input').value === AUTH.u && 
+               document.getElementById('pass-input').value === AUTH.p) {
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('admin-content').style.display = 'block';
                 document.body.style.alignItems = 'flex-start';
                 loadData();
-            } else {
-                document.getElementById('err').style.display = 'block';
-            }
+            } else { document.getElementById('err').style.display = 'block'; }
         }
 
-        function showTab(t) {
-            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-            event.target.classList.add('active');
-            if(t === 'sections') {
-                document.getElementById('sections-part').classList.remove('hidden');
-                document.getElementById('items-part').classList.add('hidden');
-            } else {
-                document.getElementById('sections-part').classList.add('hidden');
-                document.getElementById('items-part').classList.remove('hidden');
-            }
+        function showTab(id, el) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
+            document.getElementById(id + '-part').classList.remove('hidden');
+            if(id === 'view') renderList();
         }
 
         async function loadData() {
-            const res = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.file}`);
-            const data = await res.json();
-            const db = JSON.parse(atob(data.content));
-            const select = document.getElementById('p-cat');
-            select.innerHTML = '';
-            db.categories.forEach(c => {
-                let opt = document.createElement('option');
-                opt.value = c; opt.innerText = c;
-                select.appendChild(opt);
+            try {
+                const res = await fetch(`https://api.github.com/repos/${GH.repo}/contents/${GH.file}`);
+                const data = await res.json();
+                const content = JSON.parse(decodeURIComponent(escape(atob(data.content))));
+                
+                // Проверка структуры базы
+                if(!content.users) content.users = [];
+                if(!content.broadcast_msg) content.broadcast_msg = "";
+                
+                window.currentDB = content;
+                window.dbSha = data.sha;
+                
+                const sel = document.getElementById('p-cat');
+                sel.innerHTML = '';
+                content.categories.forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
+            } catch(e) { alert("Ошибка загрузки базы!"); }
+        }
+
+        function renderList() {
+            const list = document.getElementById('product-list');
+            list.innerHTML = '';
+            window.currentDB.products.forEach(p => {
+                list.innerHTML += `<div class="product-item"><span>${p.name}</span> <b>${p.price}₽</b></div>`;
             });
-            window.currentDB = db;
-            window.dbSha = data.sha;
         }
 
         async function saveData() {
-            const content = btoa(unescape(encodeURIComponent(JSON.stringify(window.currentDB, null, 2))));
-            await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.file}`, {
+            const jsonStr = JSON.stringify(window.currentDB, null, 2);
+            const contentEncoded = btoa(unescape(encodeURIComponent(jsonStr)));
+            
+            await fetch(`https://api.github.com/repos/${GH.repo}/contents/${GH.file}`, {
                 method: 'PUT',
-                headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` },
-                body: JSON.stringify({ message: "Update DB", content: content, sha: window.dbSha })
+                headers: { 'Authorization': `token ${GH.token}` },
+                body: JSON.stringify({ message: "Update via Admin", content: contentEncoded, sha: window.dbSha })
             });
+            
             document.getElementById('status').style.display = 'block';
             setTimeout(() => location.reload(), 1500);
         }
 
         function addCategory() {
-            const name = document.getElementById('new-cat').value;
-            if(!name) return;
-            window.currentDB.categories.push(name);
-            saveData();
+            const val = document.getElementById('new-cat').value;
+            if(val) { window.currentDB.categories.push(val); saveData(); }
         }
 
         function addProduct() {
@@ -141,8 +162,16 @@
                 desc: document.getElementById('p-desc').value,
                 cat: document.getElementById('p-cat').value
             };
-            window.currentDB.products.push(p);
-            saveData();
+            window.currentDB.products.push(p); saveData();
+        }
+
+        function sendBroadcast() {
+            const txt = document.getElementById('bc-text').value;
+            if(!txt) return alert("Введите текст!");
+            if(confirm("Отправить это сообщение всем пользователям?")) {
+                window.currentDB.broadcast_msg = txt; // Записываем сообщение в базу
+                saveData();
+            }
         }
     </script>
 </body>
