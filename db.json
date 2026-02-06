@@ -1,7 +1,68 @@
 {
-  "categories": ["VIP Аккаунты", "Тестовый раздел"],
-  "products": [],
-  "users": [],
-  "broadcast_msg": "",
-  "last_update": 0
+  "products": [
+    {
+      "id": 1700000000001,
+      "name": "PREMIUM_ACCESS_V1",
+      "price": "500",
+      "secret": "KEY-8822-X991-Z001\nKEY-7733-A112-B992",
+      "cat": "🔑 КЛЮЧИ"
+    },
+    {
+      "id": 1700000000002,
+      "name": "NETFLIX_ULTRA_HD",
+      "price": "250",
+      "secret": "login:pass:profile_pin\nadmin:qwerty:1234",
+      "cat": "🎬 АККАУНТЫ"
+    }
+  ],
+  "categories": [
+    "🔑 КЛЮЧИ",
+    "🎬 АККАУНТЫ",
+    "🤖 НЕЙРОСЕТИ",
+    "💎 ПОДПИСКИ"
+  ],
+  "users": [
+    {
+      "id": 123456789,
+      "name": "Admin_Root",
+      "balance": 5000,
+      "reg_date": "2026-02-06"
+    }
+  ],
+  "promocodes": [
+    {
+      "code": "ELECTRUM_START",
+      "discount": "10"
+    }
+  ],
+  "orders": [
+    {
+      "id": 5001,
+      "user_id": 123456789,
+      "sum": "500",
+      "item": "PREMIUM_ACCESS_V1",
+      "date": "2026-02-06"
+    }
+  ],
+  "broadcast": {
+    "img": "",
+    "txt": "Добро пожаловать в ELECTRUM OS!",
+    "btn_t": "К покупкам",
+    "btn_l": "https://t.me/your_bot",
+    "time": 1707200000000
+  },
+  "wheel_prizes": [
+    "100₽ на баланс",
+    "Скидка 20%",
+    "Бонусный товар"
+  ],
+  "logs": [
+    {
+      "time": "15:40:00",
+      "msg": "SYSTEM_INITIALIZED"
+    }
+  ],
+  "giveaways": [],
+  "tickets": [],
+  "last_update": 1707200000000
 }
