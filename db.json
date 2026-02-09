@@ -1,9 +1,19 @@
 {
-  "products": [],
-  "categories": ["📦 ТОВАРЫ", "⚙️ СЕРВИСЫ"],
   "users": [],
+  "products": [
+    {
+      "id": "101",
+      "category": "TEST",
+      "price": 0,
+      "name_ru": "Тестовый Товар",
+      "desc_ru": "Описание товара",
+      "content": "Твой-Ключ-12345"
+    }
+  ],
   "orders": [],
-  "logs": [{"time": "15:55", "msg": "SYSTEM_READY"}],
-  "broadcast": {"txt": ""},
-  "promocodes": []
+  "settings": {
+    "support": "@Suetolog_1",
+    "manager": "@Manager"
+  },
+  "broadcast": {}
 }
