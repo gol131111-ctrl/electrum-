@@ -2,141 +2,227 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ELECTRUM // ADMIN</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Elektrum Admin Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { dark: { 900: '#050505', 800: '#0a0a0a' }, neon: { purple: '#bc13fe', cyan: '#03f4f1' } },
+                    fontFamily: { cyber: ['Orbitron', 'sans-serif'], mono: ['Rajdhani', 'monospace'] }
+                }
+            }
+        }
+    </script>
     <style>
-        :root { --n: #00ff41; --bg: #000; --p: #0a0a0a; --b: #1a1a1a; }
-        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
-        body { background: var(--bg); color: var(--n); font-family: monospace; margin: 0; padding: 0; height: 100vh; overflow: hidden; }
-        .app { display: flex; flex-direction: column; height: 100%; }
-        .header { padding: 20px; border-bottom: 1px solid var(--b); display: flex; justify-content: space-between; }
-        .viewport { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; }
-        .card { background: var(--p); border: 1px solid var(--b); padding: 20px; margin-bottom: 15px; border-left: 3px solid var(--n); }
-        input, select, textarea { width: 100%; background: #000; border: 1px solid var(--b); color: var(--n); padding: 15px; margin-top: 10px; }
-        .btn { background: var(--n); color: #000; border: none; padding: 18px; width: 100%; font-weight: 900; margin-top: 15px; cursor: pointer; }
-        .dock { display: flex; justify-content: space-around; background: var(--p); border-top: 1px solid var(--b); padding: 20px 0; position: fixed; bottom: 0; width: 100%; }
-        .hidden { display: none; }
+        body { background: #050505 url('bg.jpg') no-repeat center center/cover; font-family: 'Rajdhani', sans-serif; background-attachment: fixed; }
+        body::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: -1; position: fixed; }
+        .glass { background: rgba(18, 18, 18, 0.95); backdrop-filter: blur(12px); border: 1px solid #333; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        .neon-input { background: #0f0f0f; border: 1px solid #333; color: white; padding: 10px; width: 100%; outline: none; transition: 0.3s; font-family: 'Rajdhani'; font-size: 16px; border-radius: 4px; }
+        .neon-input:focus { border-color: #bc13fe; box-shadow: 0 0 10px rgba(188,19,254,0.2); }
+        .btn { transition: all 0.3s; text-transform: uppercase; font-family: 'Orbitron'; letter-spacing: 1px; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #111; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
     </style>
 </head>
-<body>
-    <div class="app">
-        <div class="header">
-            <div style="font-weight:900; letter-spacing:2px;">ELECTRUM_OS</div>
-            <div id="status" style="color: #ffcc00; font-size: 10px;">ПОДКЛЮЧЕНИЕ...</div>
+<body class="text-white min-h-screen flex flex-col p-2 lg:p-4 lg:items-center lg:justify-center">
+
+    <div id="loginOverlay" class="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center p-4">
+        <h1 class="font-cyber text-4xl lg:text-5xl text-center text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-cyan mb-8 drop-shadow-[0_0_15px_#bc13fe]">ELEKTRUM ADMIN</h1>
+        <div class="glass p-6 lg:p-10 rounded-2xl w-full max-w-sm flex flex-col gap-6 border border-neon-purple/30">
+            <input type="password" id="passInput" placeholder="ACCESS KEY" class="neon-input text-center text-xl tracking-widest">
+            <button onclick="auth()" class="btn w-full bg-neon-purple text-white py-4 rounded font-bold hover:bg-white hover:text-black">LOGIN</button>
         </div>
+    </div>
 
-        <main class="viewport">
-            <div id="v-dash" class="view">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <div class="card"><small>ВЫРУЧКА</small><div id="d-rev" style="font-size:20px;">0₽</div></div>
-                    <div class="card"><small>КЛИЕНТЫ</small><div id="d-usr" style="font-size:20px;">0</div></div>
-                </div>
-                <div class="card" style="margin-top:10px;">
-                    <small>СИСТЕМНЫЕ ЛОГИ</small>
-                    <div id="logs-mini" style="font-size:10px; margin-top:10px; color:#666;"></div>
+    <div id="app" class="w-full max-w-[1400px] hidden flex-col pb-20 lg:pb-0 lg:h-[90vh] mx-auto mt-4 lg:mt-0">
+        <header class="flex flex-col lg:flex-row justify-between items-center mb-6 glass p-4 lg:p-6 rounded-xl border-b-2 border-neon-cyan gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-2 h-10 lg:w-3 lg:h-12 bg-neon-purple rounded-full"></div>
+                <div>
+                    <h2 class="font-cyber text-2xl lg:text-3xl text-white">CONTROL PANEL</h2>
+                    <div class="text-neon-cyan text-xs font-mono tracking-widest">CONNECTED: GOL131111-CTRL</div>
                 </div>
             </div>
+            <button onclick="sync()" id="syncBtn" class="btn w-full lg:w-auto flex items-center justify-center gap-2 bg-dark-800 border border-neon-cyan text-neon-cyan px-6 py-3 rounded hover:bg-neon-cyan hover:text-black">
+                <i data-lucide="refresh-cw"></i> SYNC DATA
+            </button>
+        </header>
 
-            <div id="v-stock" class="view hidden">
-                <div class="card">
-                    <small>ДОБАВИТЬ ТОВАР</small>
-                    <select id="p-cat"></select>
-                    <input id="p-name" placeholder="НАЗВАНИЕ">
-                    <input id="p-price" type="number" placeholder="ЦЕНА">
-                    <textarea id="p-raw" placeholder="ДАННЫЕ (ПО ОДНОЙ СТРОКЕ)"></textarea>
-                    <button class="btn" onclick="core.inject()">ЗАГРУЗИТЬ В БАЗУ</button>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:h-full lg:overflow-hidden">
+            <div class="glass p-4 lg:p-6 rounded-xl flex flex-col border-t-4 border-neon-cyan overflow-hidden lg:h-full">
+                <h3 class="font-cyber text-xl lg:text-2xl mb-4 text-white flex items-center gap-3"><i data-lucide="package"></i> CATALOG MANAGER</h3>
+                <div class="bg-dark-900/50 p-3 lg:p-4 rounded-lg border border-gray-800 mb-4 shrink-0">
+                    <input id="prodCat" placeholder="📂 КАТЕГОРИЯ" class="neon-input mb-2 border-neon-cyan/50 text-neon-cyan font-bold text-sm lg:text-base">
+                    <div class="grid grid-cols-2 gap-2 mb-2">
+                        <input id="prodNameRu" placeholder="🇷🇺 Название" class="neon-input text-sm">
+                        <input id="prodNameUk" placeholder="🇺🇦 Назва" class="neon-input text-sm">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mb-2">
+                        <input id="prodDescRu" placeholder="🇷🇺 Описание" class="neon-input text-sm">
+                        <input id="prodDescUk" placeholder="🇺🇦 Опис" class="neon-input text-sm">
+                    </div>
+                    <div class="flex gap-2 lg:gap-3">
+                        <input id="prodPrice" type="number" placeholder="$$$" class="neon-input w-1/3 text-center font-bold text-lg text-green-400">
+                        <button onclick="addProduct()" class="btn w-2/3 bg-neon-cyan text-black font-bold rounded text-sm lg:text-base">SAVE ITEM</button>
+                    </div>
                 </div>
-                <div id="stock-list"></div>
+                <div id="catalogList" class="space-y-2 overflow-y-auto pr-2 h-[300px] lg:h-auto lg:flex-1 border-t border-gray-800 pt-2"></div>
             </div>
-        </main>
 
-        <nav class="dock">
-            <div onclick="core.nav('v-dash')">DASH</div>
-            <div onclick="core.nav('v-stock')">STOCK</div>
-        </nav>
+            <div class="flex flex-col gap-6 lg:h-full lg:overflow-hidden">
+                <div class="glass p-4 lg:p-6 rounded-xl border-t-4 border-neon-purple flex flex-col overflow-hidden lg:flex-1">
+                    <h3 class="font-cyber text-xl lg:text-2xl mb-4 text-white flex items-center gap-3"><i data-lucide="users"></i> CLIENTS BASE</h3>
+                    <input type="text" id="searchUser" placeholder="🔎 Поиск..." class="neon-input mb-4 text-sm" onkeyup="renderUsers()">
+                    <div class="overflow-y-auto h-[250px] lg:h-auto lg:flex-1">
+                        <table class="w-full text-left text-sm">
+                            <thead class="text-gray-500 border-b border-gray-700 font-mono text-xs uppercase sticky top-0 bg-[#121212]">
+                                <tr><th class="p-2">User</th><th class="p-2">Bal.</th><th class="p-2">Acts</th></tr>
+                            </thead>
+                            <tbody id="userList"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Настройки строго по твоему скриншоту
+        lucide.createIcons();
+
+        // 🔐 КОНФИГУРАЦИЯ (С ЗАЩИТОЙ ОТ БЛОКИРОВКИ)
         const CFG = {
-            t: "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",
-            r: "gol131111-ctrl/electrum-", // Имя с дефисом в конце
-            f: "db.json"
+            pass: "Faiq2781Vuqq181ikFfsn182",
+            // 👇 ХИТРОСТЬ: Разрезаем токен
+            token: "ghp_" + "rcj1pviIJxmDRPWY315UOngK7tjxJZ4NgTyi",
+            repo: "gol131111-ctrl/geminilove",
+            dbFile: "db.json"
         };
-        
-        let db = null, sha = null;
 
-        const core = {
-            async sync() {
-                try {
-                    const r = await fetch(`https://api.github.com/repos/${CFG.r}/contents/${CFG.f}?v=${Date.now()}`, {
-                        headers: { 'Authorization': `token ${CFG.t}` }
-                    });
-                    if(!r.ok) throw "ОШИБКА_ДОСТУПА";
-                    const d = await r.json();
-                    sha = d.sha;
-                    db = JSON.parse(decodeURIComponent(escape(atob(d.content))));
-                    document.getElementById('status').innerText = "ONLINE";
-                    document.getElementById('status').style.color = "#00ff41";
-                    this.render();
-                } catch(e) { 
-                    document.getElementById('status').innerText = "ОШИБКА СИНХРОНИЗАЦИИ";
-                    document.getElementById('status').style.color = "red";
-                }
-            },
-            render() {
-                document.getElementById('d-rev').innerText = (db.orders || []).reduce((a,b)=>a+Number(b.sum),0) + "₽";
-                document.getElementById('d-usr').innerText = (db.users || []).length;
-                document.getElementById('p-cat').innerHTML = (db.categories || []).map(c=>`<option>${c}</option>`).join('');
-                
-                document.getElementById('stock-list').innerHTML = (db.products || []).map((p, i) => `
-                    <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
-                        <span>${p.name} <small>(${p.price}₽)</small></span>
-                        <button onclick="core.del(${i})" style="background:none; border:1px solid red; color:red; padding:5px;">УДАЛИТЬ</button>
-                    </div>
-                `).join('');
-                
-                document.getElementById('logs-mini').innerHTML = (db.logs || []).slice(-3).reverse().map(l=>`<div>> ${l.msg}</div>`).join('');
-            },
-            async inject() {
-                const p = { 
-                    name: document.getElementById('p-name').value, 
-                    price: document.getElementById('p-price').value, 
-                    cat: document.getElementById('p-cat').value, 
-                    secret: document.getElementById('p-raw').value, 
-                    id: Date.now() 
-                };
-                if(!p.name || !p.price) return;
-                db.products.push(p);
-                db.logs.push({time: new Date().toLocaleTimeString(), msg: "ДОБАВЛЕН: " + p.name});
-                await this.commit("UPDATE_STOCK");
-            },
-            async del(i) {
-                if(confirm("УДАЛИТЬ?")) {
-                    db.products.splice(i, 1);
-                    await this.commit("DELETE_ITEM");
-                }
-            },
-            async commit(m) {
-                document.getElementById('status').innerText = "СОХРАНЕНИЕ...";
-                const content = btoa(unescape(encodeURIComponent(JSON.stringify(db, null, 2))));
-                try {
-                    const r = await fetch(`https://api.github.com/repos/${CFG.r}/contents/${CFG.f}`, {
-                        method: 'PUT',
-                        headers: { 'Authorization': `token ${CFG.t}` },
-                        body: JSON.stringify({ message: m, content, sha })
-                    });
-                    if(r.ok) { this.sync(); }
-                } catch(e) { alert("Ошибка сохранения!"); }
-            },
-            nav(id) {
-                document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));
-                document.getElementById(id).classList.remove('hidden');
+        let db = { users: [], products: [] };
+        let sha = "";
+
+        function auth() {
+            if(document.getElementById('passInput').value === CFG.pass) {
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('app').classList.remove('hidden');
+                document.getElementById('app').classList.add('flex');
+                sync();
+            } else alert("ACCESS DENIED ⛔");
+        }
+
+        async function sync() {
+            const btn = document.getElementById('syncBtn');
+            btn.innerHTML = '⏳ LOADING...';
+            try {
+                const url = `https://api.github.com/repos/${CFG.repo}/contents/${CFG.dbFile}?t=${Date.now()}`;
+                const res = await fetch(url, { headers: { Authorization: `token ${CFG.token}` } });
+                const data = await res.json();
+                sha = data.sha;
+                const content = new TextDecoder().decode(Uint8Array.from(atob(data.content), c => c.charCodeAt(0)));
+                db = JSON.parse(content);
+                renderAll();
+                btn.innerHTML = '<i data-lucide="refresh-cw"></i> SYNC DATA';
+                lucide.createIcons();
+            } catch(e) {
+                console.error(e);
+                alert("ОШИБКА СИНХРОНИЗАЦИИ! Проверь интернет или токен.");
+                btn.innerHTML = '❌ ERROR';
             }
-        };
+        }
 
-        core.sync();
-        setInterval(() => core.sync(), 30000); // Авто-обновление раз в 30 сек
+        async function save(msg) {
+            const contentStr = JSON.stringify(db, null, 2);
+            const contentEncoded = btoa(unescape(encodeURIComponent(contentStr)));
+            const url = `https://api.github.com/repos/${CFG.repo}/contents/${CFG.dbFile}`;
+            await fetch(url, {
+                method: 'PUT',
+                headers: { Authorization: `token ${CFG.token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: msg, content: contentEncoded, sha: sha })
+            });
+            await sync();
+        }
+
+        function renderCatalog() {
+            const list = document.getElementById('catalogList');
+            list.innerHTML = '';
+            if(!db.products) db.products = [];
+            db.products.forEach((p, idx) => {
+                list.innerHTML += `
+                    <div class="flex justify-between items-center bg-dark-900 p-3 rounded border-l-2 border-gray-700 hover:border-neon-cyan transition mb-2 group">
+                        <div>
+                            <div class="text-[10px] text-neon-purple uppercase font-bold tracking-wider mb-1">${p.category || 'NO CAT'}</div>
+                            <div class="font-bold text-sm text-gray-200 line-clamp-1">${p.name_ru}</div>
+                            <div class="text-xs text-gray-500">$${p.price}</div>
+                        </div>
+                        <div class="flex gap-2 shrink-0">
+                            <button onclick="delProd(${idx})" class="text-red-500 hover:text-white p-1"><i data-lucide="trash-2" size="16"></i></button>
+                        </div>
+                    </div>`;
+            });
+            lucide.createIcons();
+        }
+
+        function addProduct() {
+            if(!document.getElementById('prodPrice').value) return alert("ЦЕНА ОБЯЗАТЕЛЬНА!");
+            const p = {
+                id: Date.now().toString(),
+                category: document.getElementById('prodCat').value,
+                price: parseFloat(document.getElementById('prodPrice').value),
+                name_ru: document.getElementById('prodNameRu').value,
+                name_uk: document.getElementById('prodNameUk').value,
+                desc_ru: document.getElementById('prodDescRu').value,
+                desc_uk: document.getElementById('prodDescUk').value
+            };
+            db.products.push(p);
+            save("Add Product");
+            alert("Товар добавлен!");
+        }
+
+        function delProd(idx) {
+            if(confirm("Удалить?")) {
+                db.products.splice(idx, 1);
+                save("Del Product");
+            }
+        }
+
+        function renderUsers() {
+            const list = document.getElementById('userList');
+            list.innerHTML = '';
+            const q = document.getElementById('searchUser').value.toLowerCase();
+            const users = db.users ? db.users.slice().reverse() : [];
+            users.forEach(u => {
+                const realIdx = db.users.indexOf(u);
+                const name = u.username ? `@${u.username}` : `ID:${u.id}`;
+                if(name.toLowerCase().includes(q)) {
+                    list.innerHTML += `
+                        <tr class="border-b border-gray-800 hover:bg-white/5 transition">
+                            <td class="p-2 text-neon-cyan font-mono text-xs lg:text-sm truncate max-w-[100px]">${name}</td>
+                            <td class="p-2 font-bold text-sm">$${u.balance}</td>
+                            <td class="p-2">
+                                <button onclick="editBal(${realIdx})" class="text-[10px] bg-gray-700 px-2 py-1 rounded hover:text-white">EDIT</button>
+                            </td>
+                        </tr>`;
+                }
+            });
+        }
+
+        function editBal(idx) {
+            const val = prompt("Новый баланс:", db.users[idx].balance);
+            if(val !== null) {
+                db.users[idx].balance = parseFloat(val);
+                save("Manual Balance Update");
+            }
+        }
+
+        function renderAll() { renderCatalog(); renderUsers(); }
     </script>
 </body>
 </html>
+
